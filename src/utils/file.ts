@@ -6,12 +6,10 @@ export interface FileResult {
   name: string
 }
 
-// 检测是否在 Tauri 环境
 function isTauri(): boolean {
   return typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window
 }
 
-// 浏览器端：用 input[type=file] 选择文件
 function openFileBrowser(): Promise<FileResult | null> {
   return new Promise((resolve) => {
     const input = document.createElement('input')
@@ -36,12 +34,10 @@ function openFileBrowser(): Promise<FileResult | null> {
 }
 
 export async function openFileDialog(): Promise<FileResult | null> {
-  // 浏览器环境：用原生 input
   if (!isTauri()) {
     return openFileBrowser()
   }
 
-  // Tauri 环境：用原生对话框
   try {
     const { open } = await import('@tauri-apps/plugin-dialog')
     const selected = await open({
@@ -68,6 +64,44 @@ export async function readFileAtPath(path: string): Promise<FileResult> {
   const content = await invoke<string>('read_file', { path })
   const name = path.split(/[/\\]/).pop() || path
   return { content, path, name }
+}
+
+export async function saveFile(content: string, fileName: string): Promise<string | null> {
+  if (!isTauri()) {
+    // 浏览器环境：下载文件
+    const blob = new Blob([content], { type: 'text/markdown;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = fileName
+    a.click()
+    URL.revokeObjectURL(url)
+    return null
+  }
+
+  try {
+    const { save } = await import('@tauri-apps/plugin-dialog')
+    const filePath = await save({
+      defaultPath: fileName,
+      filters: [
+        { name: 'Markdown', extensions: ['md'] },
+        { name: '所有文件', extensions: ['*'] },
+      ],
+    })
+    if (!filePath) return null
+    await invoke('write_file', { path: filePath, content })
+    return filePath
+  } catch {
+    // 回退到浏览器下载
+    const blob = new Blob([content], { type: 'text/markdown;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = fileName
+    a.click()
+    URL.revokeObjectURL(url)
+    return null
+  }
 }
 
 export function getFileExtension(name: string): string {

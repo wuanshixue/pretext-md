@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import type { Block } from '../core/markdown'
 import { parseMarkdown } from '../core/markdown'
 import type { FileResult } from '../utils/file'
+import { useSettingsStore } from './settings'
 
 interface ReaderState {
   filePath: string | null
@@ -56,6 +57,7 @@ export const useReaderStore = create<ReaderState>((set) => ({
   },
 
   createNewFile: () => {
+    useSettingsStore.getState().setViewMode('edit')
     set({
       filePath: null,
       fileName: '未命名.md',

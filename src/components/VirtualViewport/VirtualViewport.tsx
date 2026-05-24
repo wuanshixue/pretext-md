@@ -1,4 +1,4 @@
-import { memo, useCallback } from 'react'
+import { useCallback } from 'react'
 import type { Block } from '../../core/markdown'
 import { BlockRenderer } from '../Reader/BlockRenderer'
 import { useVirtualScroll } from '../../hooks/useVirtualScroll'
@@ -6,17 +6,8 @@ import { useSettingsStore } from '../../stores/settings'
 import { useReaderStore } from '../../stores/reader'
 import { useHistoryStore } from '../../stores/history'
 
-interface VirtualViewportProps {
-  blocks: Block[]
-  scrollToBlockIndex?: number | null
-  onScrollToBlockDone?: () => void
-}
-
-export const VirtualViewport = memo(function VirtualViewport({
-  blocks,
-  scrollToBlockIndex,
-  onScrollToBlockDone,
-}: VirtualViewportProps) {
+export function VirtualViewport() {
+  const blocks = useReaderStore((s) => s.blocks)
   const { fontSize, maxWidth, lineHeight } = useSettingsStore()
   const setProgress = useReaderStore((s) => s.setProgress)
   const setScrollTop = useReaderStore((s) => s.setScrollTop)
@@ -30,7 +21,6 @@ export const VirtualViewport = memo(function VirtualViewport({
     visibleEnd,
     containerRef,
     onBlockMeasured,
-    scrollToBlock,
   } = useVirtualScroll({ blocks })
 
   const handleScroll = useCallback(() => {
@@ -48,11 +38,6 @@ export const VirtualViewport = memo(function VirtualViewport({
       updateProgress(filePath, progress)
     }
   }, [containerRef, totalHeight, setScrollTop, setProgress, filePath, updateProgress])
-
-  if (scrollToBlockIndex !== null && scrollToBlockIndex !== undefined) {
-    scrollToBlock(scrollToBlockIndex)
-    onScrollToBlockDone?.()
-  }
 
   const visibleBlocks = blocks.slice(visibleStart, visibleEnd)
   const offsetY = blockMetas[visibleStart]?.offset || 0
@@ -77,7 +62,7 @@ export const VirtualViewport = memo(function VirtualViewport({
           {visibleBlocks.map((block, i) => {
             const absoluteIndex = visibleStart + i
             return (
-              <MemoizedBlock
+              <BlockRenderer
                 key={block.id}
                 block={block}
                 onHeightMeasured={(h) => onBlockMeasured(absoluteIndex, h)}
@@ -88,17 +73,4 @@ export const VirtualViewport = memo(function VirtualViewport({
       </div>
     </div>
   )
-})
-
-const MemoizedBlock = memo(
-  function MemoizedBlockInner({
-    block,
-    onHeightMeasured,
-  }: {
-    block: Block
-    onHeightMeasured: (h: number) => void
-  }) {
-    return <BlockRenderer block={block} onHeightMeasured={onHeightMeasured} />
-  },
-  (prev, next) => prev.block.id === next.block.id
-)
+}

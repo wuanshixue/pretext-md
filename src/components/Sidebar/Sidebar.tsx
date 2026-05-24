@@ -1,8 +1,9 @@
-import { BookOpen, FileText, X, Settings, ChevronLeft, FilePlus } from 'lucide-react'
+import { BookOpen, FileText, X, Settings, ChevronLeft, FilePlus, Save } from 'lucide-react'
 import { useReaderStore } from '../../stores/reader'
 import { useHistoryStore } from '../../stores/history'
 import { useSettingsStore } from '../../stores/settings'
 import { useFileImport } from '../../hooks/useFileImport'
+import { saveFile } from '../../utils/file'
 
 interface SidebarProps {
   onOpenSettings?: () => void
@@ -13,6 +14,8 @@ const SIDEBAR_WIDTH = 220
 export function Sidebar({ onOpenSettings }: SidebarProps) {
   const { sidebarOpen, toggleSidebar } = useSettingsStore()
   const fileName = useReaderStore((s) => s.fileName)
+  const filePath = useReaderStore((s) => s.filePath)
+  const rawMarkdown = useReaderStore((s) => s.rawMarkdown)
   const blocks = useReaderStore((s) => s.blocks)
   const recentFiles = useHistoryStore((s) => s.recentFiles)
   const { importViaDialog, importFromPath } = useFileImport()
@@ -169,6 +172,25 @@ export function Sidebar({ onOpenSettings }: SidebarProps) {
             <FilePlus className="w-4 h-4" style={{ color: 'var(--green)' }} />
             新建文件
           </button>
+          {fileName && (
+            <button
+              onClick={async () => {
+                const savedPath = await saveFile(rawMarkdown, fileName)
+                if (savedPath) {
+                  useReaderStore.setState({ filePath: savedPath })
+                }
+              }}
+              className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold transition-all hover:opacity-80"
+              style={{
+                fontFamily: 'var(--font-ui)',
+                color: 'var(--text)',
+                background: 'rgba(216,185,138,0.15)',
+              }}
+            >
+              <Save className="w-4 h-4" style={{ color: 'var(--wood)' }} />
+              {filePath ? '另存为...' : '保存文件'}
+            </button>
+          )}
           {fileName && (
             <button
               onClick={clear}

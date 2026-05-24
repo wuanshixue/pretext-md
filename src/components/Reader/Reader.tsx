@@ -19,8 +19,8 @@ export function Reader() {
   const maxWidth = useSettingsStore((s) => s.maxWidth)
   const viewMode = useSettingsStore((s) => s.viewMode)
   const searchVisible = useSearchUIStore((s) => s.visible)
-  const toggleSearch = useSearchUIStore((s) => s.toggle)
   const closeSearch = useSearchUIStore((s) => s.close)
+  const fileLoaded = useReaderStore((s) => s.fileLoaded)
 
   const [settingsVisible, setSettingsVisible] = useState(false)
   const [scrollToBlockIndex, setScrollToBlockIndex] = useState<number | null>(null)
@@ -46,8 +46,6 @@ export function Reader() {
     closeSearch()
     search.clear()
   }, [closeSearch, search])
-
-  const fileLoaded = useReaderStore((s) => s.fileLoaded)
 
   if (!fileLoaded && !isLoading) {
     return <Welcome />
@@ -107,11 +105,7 @@ export function Reader() {
                   className="h-full mx-auto flex flex-col"
                   style={{ maxWidth: `${maxWidth}ch`, padding: '24px 32px' }}
                 >
-                  <VirtualViewport
-                    blocks={blocks}
-                    scrollToBlockIndex={scrollToBlockIndex}
-                    onScrollToBlockDone={handleScrollToBlockDone}
-                  />
+                  <VirtualViewport />
                 </div>
               </div>
             </div>
@@ -123,11 +117,7 @@ export function Reader() {
                 className="h-full mx-auto flex flex-col"
                 style={{ maxWidth: `${maxWidth}ch`, padding: '24px 32px' }}
               >
-                <VirtualViewport
-                  blocks={blocks}
-                  scrollToBlockIndex={scrollToBlockIndex}
-                  onScrollToBlockDone={handleScrollToBlockDone}
-                />
+                <VirtualViewport />
               </div>
             </div>
           )}
