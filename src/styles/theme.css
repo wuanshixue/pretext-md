@@ -1,0 +1,43 @@
+:root {
+  /* 阅读器配色 */
+  --bg: #f6f1e7;
+  --card: #fffaf2;
+  --wood: #d8b98a;
+  --green: #7fa36b;
+  --text: #4b4035;
+  --muted: #8b7e74;
+  --shadow: rgba(0, 0, 0, 0.08);
+  /* 动森 UI 配色 */
+  --island-bg: #f8f8f0;
+  --island-content-bg: rgb(247, 243, 223);
+  --island-text: #725d42;
+  --island-header: #794f27;
+  --island-accent: #19c8b9;
+  --island-focus: #ffcc00;
+  --island-success: #6fba2c;
+  --island-shadow: #bdaea0;
+  --island-border: #9f927d;
+  --island-muted: #8a7b66;
+  --island-disabled: #c4b89e;
+  /* 字体 */
+  --font-ui: 'Nunito', 'Noto Sans SC', -apple-system, 'PingFang SC', sans-serif;
+  --font-reading: 'Noto Serif SC', 'Inter', 'Georgia', serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+}
+
+[data-theme='dark'] {
+  --bg: #1a1612;
+  --card: #241f1a;
+  --wood: #6b5a42;
+  --green: #5a8a47;
+  --text: #d4c9b4;
+  --muted: #8b7e74;
+  --shadow: rgba(0, 0, 0, 0.3);
+  --island-bg: #1a1612;
+  --island-content-bg: #241f1a;
+  --island-text: #d4c9b4;
+  --island-header: #e8d5bc;
+  --island-border: #4a3f34;
+  --island-muted: #8b7e74;
+  --island-disabled: #4a3f34;
+}

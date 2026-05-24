@@ -1,0 +1,134 @@
+@import 'tailwindcss';
+
+/* 全局基础样式 */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-ui);
+  overflow: hidden;
+}
+
+#root {
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* 滚动条样式 */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--island-border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
+}
+
+/* 选中文本颜色 */
+::selection {
+  background: rgba(25, 200, 185, 0.25);
+  color: var(--text);
+}
+
+/* 输入框 focus 黄色高亮（动森风格） */
+input:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--island-focus);
+  outline-offset: 2px;
+}
+
+/* 按钮基础重置 */
+button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font: inherit;
+}
+
+button:focus-visible {
+  outline: 2px solid var(--island-accent);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+/* 动森风格的卡片阴影 */
+.island-card {
+  background: var(--card);
+  border-radius: 20px;
+  box-shadow: 0 4px 0 0 var(--island-shadow), 0 6px 16px var(--shadow);
+}
+
+/* 动森风格按钮 */
+.island-button {
+  border-radius: 50px;
+  font-family: var(--font-ui);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 5px 0 0 var(--island-shadow);
+}
+
+.island-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 0 0 var(--island-shadow);
+}
+
+.island-button:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 0 var(--island-shadow);
+}
+
+/* Range slider 样式 */
+input[type='range'] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--island-border);
+  outline: none;
+}
+
+input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--island-accent);
+  cursor: pointer;
+  box-shadow: 0 3px 0 0 #11a89b;
+  transition: all 0.15s ease;
+}
+
+input[type='range']::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+}
+
+input[type='range']::-webkit-slider-thumb:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 0 0 #11a89b;
+}
