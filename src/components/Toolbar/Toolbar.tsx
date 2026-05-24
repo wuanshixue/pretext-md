@@ -10,11 +10,12 @@ import {
   Columns2,
   Eye,
   Save,
+  SaveAll,
 } from 'lucide-react'
 import { useSettingsStore, type ViewMode } from '../../stores/settings'
 import { useSearchUIStore } from '../../stores/searchUI'
 import { useReaderStore } from '../../stores/reader'
-import { saveFile } from '../../utils/file'
+import { saveFile, saveFileToPath } from '../../utils/file'
 
 const viewModes: { mode: ViewMode; label: string; icon: typeof Eye }[] = [
   { mode: 'edit', label: '编辑', icon: PenLine },
@@ -39,6 +40,18 @@ export function Toolbar() {
   const rawMarkdown = useReaderStore((s) => s.rawMarkdown)
 
   const handleSave = async () => {
+    if (!fileName) return
+    if (filePath) {
+      await saveFileToPath(filePath, rawMarkdown)
+    } else {
+      const savedPath = await saveFile(rawMarkdown, fileName)
+      if (savedPath) {
+        useReaderStore.setState({ filePath: savedPath })
+      }
+    }
+  }
+
+  const handleSaveAs = async () => {
     if (!fileName) return
     const savedPath = await saveFile(rawMarkdown, fileName)
     if (savedPath) {
@@ -119,16 +132,28 @@ export function Toolbar() {
       </motion.button>
 
       {fileName && (
-        <motion.button
-          whileHover={{ y: -1 }}
-          whileTap={{ y: 1 }}
-          onClick={handleSave}
-          className="w-8 h-8 rounded-xl flex items-center justify-center transition-colors"
-          style={{ color: 'var(--muted)' }}
-          title={filePath ? '另存为' : '保存'}
-        >
-          <Save className="w-4 h-4" />
-        </motion.button>
+        <>
+          <motion.button
+            whileHover={{ y: -1 }}
+            whileTap={{ y: 1 }}
+            onClick={handleSave}
+            className="w-8 h-8 rounded-xl flex items-center justify-center transition-colors"
+            style={{ color: 'var(--muted)' }}
+            title="保存"
+          >
+            <Save className="w-4 h-4" />
+          </motion.button>
+          <motion.button
+            whileHover={{ y: -1 }}
+            whileTap={{ y: 1 }}
+            onClick={handleSaveAs}
+            className="w-8 h-8 rounded-xl flex items-center justify-center transition-colors"
+            style={{ color: 'var(--muted)' }}
+            title="另存为"
+          >
+            <SaveAll className="w-4 h-4" />
+          </motion.button>
+        </>
       )}
 
       <div

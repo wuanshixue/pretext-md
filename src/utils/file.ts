@@ -68,7 +68,6 @@ export async function readFileAtPath(path: string): Promise<FileResult> {
 
 export async function saveFile(content: string, fileName: string): Promise<string | null> {
   if (!isTauri()) {
-    // 浏览器环境：下载文件
     const blob = new Blob([content], { type: 'text/markdown;charset=utf-8' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
@@ -92,7 +91,6 @@ export async function saveFile(content: string, fileName: string): Promise<strin
     await invoke('write_file', { path: filePath, content })
     return filePath
   } catch {
-    // 回退到浏览器下载
     const blob = new Blob([content], { type: 'text/markdown;charset=utf-8' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
@@ -102,6 +100,22 @@ export async function saveFile(content: string, fileName: string): Promise<strin
     URL.revokeObjectURL(url)
     return null
   }
+}
+
+export async function saveFileToPath(path: string, content: string): Promise<void> {
+  if (!isTauri()) {
+    // 浏览器环境没有原路径，回退为下载
+    const name = path.split(/[/\\]/).pop() || 'untitled.md'
+    const blob = new Blob([content], { type: 'text/markdown;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = name
+    a.click()
+    URL.revokeObjectURL(url)
+    return
+  }
+  await invoke('write_file', { path, content })
 }
 
 export function getFileExtension(name: string): string {

@@ -1,9 +1,9 @@
-import { BookOpen, FileText, X, Settings, ChevronLeft, FilePlus, Save } from 'lucide-react'
+import { BookOpen, FileText, X, Settings, ChevronLeft, FilePlus, Save, SaveAll } from 'lucide-react'
 import { useReaderStore } from '../../stores/reader'
 import { useHistoryStore } from '../../stores/history'
 import { useSettingsStore } from '../../stores/settings'
 import { useFileImport } from '../../hooks/useFileImport'
-import { saveFile } from '../../utils/file'
+import { saveFile, saveFileToPath } from '../../utils/file'
 
 interface SidebarProps {
   onOpenSettings?: () => void
@@ -175,9 +175,13 @@ export function Sidebar({ onOpenSettings }: SidebarProps) {
           {fileName && (
             <button
               onClick={async () => {
-                const savedPath = await saveFile(rawMarkdown, fileName)
-                if (savedPath) {
-                  useReaderStore.setState({ filePath: savedPath })
+                if (filePath) {
+                  await saveFileToPath(filePath, rawMarkdown)
+                } else {
+                  const savedPath = await saveFile(rawMarkdown, fileName)
+                  if (savedPath) {
+                    useReaderStore.setState({ filePath: savedPath })
+                  }
                 }
               }}
               className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold transition-all hover:opacity-80"
@@ -188,7 +192,25 @@ export function Sidebar({ onOpenSettings }: SidebarProps) {
               }}
             >
               <Save className="w-4 h-4" style={{ color: 'var(--wood)' }} />
-              {filePath ? '另存为...' : '保存文件'}
+              保存
+            </button>
+          )}
+          {fileName && (
+            <button
+              onClick={async () => {
+                const savedPath = await saveFile(rawMarkdown, fileName)
+                if (savedPath) {
+                  useReaderStore.setState({ filePath: savedPath })
+                }
+              }}
+              className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold transition-all hover:opacity-80"
+              style={{
+                fontFamily: 'var(--font-ui)',
+                color: 'var(--muted)',
+              }}
+            >
+              <SaveAll className="w-4 h-4" />
+              另存为
             </button>
           )}
           {fileName && (
