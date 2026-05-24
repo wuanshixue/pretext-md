@@ -47,7 +47,9 @@ export function Reader() {
     search.clear()
   }, [closeSearch, search])
 
-  if (blocks.length === 0 && !isLoading) {
+  const fileLoaded = useReaderStore((s) => s.fileLoaded)
+
+  if (!fileLoaded && !isLoading) {
     return <Welcome />
   }
 

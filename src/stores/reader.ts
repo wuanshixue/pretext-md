@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import type { Block } from '../core/markdown'
 import { parseMarkdown } from '../core/markdown'
-import { readFileAtPath, type FileResult } from '../utils/file'
+import type { FileResult } from '../utils/file'
 
 interface ReaderState {
   filePath: string | null
@@ -12,9 +12,10 @@ interface ReaderState {
   progress: number
   isLoading: boolean
   error: string | null
+  fileLoaded: boolean // 标记是否已加载文件（区分空文件和未加载）
 
   loadFile: (file: FileResult) => Promise<void>
-  loadFromContent: (content: string, name: string) => void
+  createNewFile: () => void
   setRawMarkdown: (md: string) => void
   setScrollTop: (top: number) => void
   setProgress: (progress: number) => void
@@ -30,6 +31,7 @@ export const useReaderStore = create<ReaderState>((set) => ({
   progress: 0,
   isLoading: false,
   error: null,
+  fileLoaded: false,
 
   loadFile: async (file: FileResult) => {
     set({ isLoading: true, error: null })
@@ -43,6 +45,7 @@ export const useReaderStore = create<ReaderState>((set) => ({
         isLoading: false,
         scrollTop: 0,
         progress: 0,
+        fileLoaded: true,
       })
     } catch (err) {
       set({
@@ -52,24 +55,18 @@ export const useReaderStore = create<ReaderState>((set) => ({
     }
   },
 
-  loadFromContent: (content: string, name: string) => {
-    try {
-      const blocks = parseMarkdown(content)
-      set({
-        filePath: null,
-        fileName: name,
-        blocks,
-        rawMarkdown: content,
-        isLoading: false,
-        error: null,
-        scrollTop: 0,
-        progress: 0,
-      })
-    } catch (err) {
-      set({
-        error: err instanceof Error ? err.message : '解析失败',
-      })
-    }
+  createNewFile: () => {
+    set({
+      filePath: null,
+      fileName: '未命名.md',
+      blocks: [],
+      rawMarkdown: '',
+      scrollTop: 0,
+      progress: 0,
+      isLoading: false,
+      error: null,
+      fileLoaded: true,
+    })
   },
 
   setRawMarkdown: (md: string) => {
@@ -77,7 +74,6 @@ export const useReaderStore = create<ReaderState>((set) => ({
       const blocks = parseMarkdown(md)
       set({ rawMarkdown: md, blocks, error: null })
     } catch {
-      // 解析失败时只更新文本，保留旧 blocks
       set({ rawMarkdown: md })
     }
   },
@@ -95,5 +91,6 @@ export const useReaderStore = create<ReaderState>((set) => ({
       progress: 0,
       isLoading: false,
       error: null,
+      fileLoaded: false,
     }),
 }))

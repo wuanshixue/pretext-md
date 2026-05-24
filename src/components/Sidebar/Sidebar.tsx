@@ -1,4 +1,4 @@
-import { BookOpen, FileText, X, Settings, ChevronLeft, ChevronRight } from 'lucide-react'
+import { BookOpen, FileText, X, Settings, ChevronLeft, FilePlus } from 'lucide-react'
 import { useReaderStore } from '../../stores/reader'
 import { useHistoryStore } from '../../stores/history'
 import { useSettingsStore } from '../../stores/settings'
@@ -17,6 +17,7 @@ export function Sidebar({ onOpenSettings }: SidebarProps) {
   const recentFiles = useHistoryStore((s) => s.recentFiles)
   const { importViaDialog, importFromPath } = useFileImport()
   const clear = useReaderStore((s) => s.clear)
+  const createNewFile = useReaderStore((s) => s.createNewFile)
 
   const headings = blocks
     .filter((b) => b.type === 'heading')
@@ -155,6 +156,18 @@ export function Sidebar({ onOpenSettings }: SidebarProps) {
           >
             <FileText className="w-4 h-4" style={{ color: 'var(--island-accent)' }} />
             打开文件
+          </button>
+          <button
+            onClick={createNewFile}
+            className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold transition-all hover:opacity-80"
+            style={{
+              fontFamily: 'var(--font-ui)',
+              color: 'var(--text)',
+              background: 'rgba(127,163,107,0.1)',
+            }}
+          >
+            <FilePlus className="w-4 h-4" style={{ color: 'var(--green)' }} />
+            新建文件
           </button>
           {fileName && (
             <button

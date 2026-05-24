@@ -8,24 +8,21 @@ export function Editor() {
   const fontSize = useSettingsStore((s) => s.fontSize)
   const lineHeight = useSettingsStore((s) => s.lineHeight)
   const maxWidth = useSettingsStore((s) => s.maxWidth)
-  const theme = useSettingsStore((s) => s.theme)
 
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
 
-  // 防抖更新
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       const value = e.target.value
       clearTimeout(timerRef.current)
       timerRef.current = setTimeout(() => {
         setRawMarkdown(value)
-      }, 300)
+      }, 80)
     },
     [setRawMarkdown]
   )
 
-  // Tab 缩进
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
       if (e.key === 'Tab') {
