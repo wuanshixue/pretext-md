@@ -9,10 +9,12 @@ import {
   PenLine,
   Columns2,
   Eye,
+  Save,
 } from 'lucide-react'
 import { useSettingsStore, type ViewMode } from '../../stores/settings'
 import { useSearchUIStore } from '../../stores/searchUI'
 import { useReaderStore } from '../../stores/reader'
+import { saveFile } from '../../utils/file'
 
 const viewModes: { mode: ViewMode; label: string; icon: typeof Eye }[] = [
   { mode: 'edit', label: '编辑', icon: PenLine },
@@ -33,7 +35,16 @@ export function Toolbar() {
   } = useSettingsStore()
   const toggleSearch = useSearchUIStore((s) => s.toggle)
   const fileName = useReaderStore((s) => s.fileName)
-  const progress = useReaderStore((s) => s.progress)
+  const filePath = useReaderStore((s) => s.filePath)
+  const rawMarkdown = useReaderStore((s) => s.rawMarkdown)
+
+  const handleSave = async () => {
+    if (!fileName) return
+    const savedPath = await saveFile(rawMarkdown, fileName)
+    if (savedPath) {
+      useReaderStore.setState({ filePath: savedPath })
+    }
+  }
 
   return (
     <div
@@ -107,6 +118,19 @@ export function Toolbar() {
         <Search className="w-4 h-4" />
       </motion.button>
 
+      {fileName && (
+        <motion.button
+          whileHover={{ y: -1 }}
+          whileTap={{ y: 1 }}
+          onClick={handleSave}
+          className="w-8 h-8 rounded-xl flex items-center justify-center transition-colors"
+          style={{ color: 'var(--muted)' }}
+          title={filePath ? '另存为' : '保存'}
+        >
+          <Save className="w-4 h-4" />
+        </motion.button>
+      )}
+
       <div
         className="flex items-center gap-0.5 px-1 py-0.5 rounded-xl"
         style={{ background: 'rgba(0,0,0,0.04)' }}
@@ -149,28 +173,6 @@ export function Toolbar() {
       >
         {theme === 'light' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
       </motion.button>
-
-      {fileName && (
-        <div className="ml-2 w-20">
-          <div
-            className="h-1 rounded-full overflow-hidden"
-            style={{ background: 'rgba(0,0,0,0.06)' }}
-          >
-            <motion.div
-              className="h-full rounded-full"
-              style={{ background: 'var(--island-success)' }}
-              animate={{ width: `${progress}%` }}
-              transition={{ duration: 0.2 }}
-            />
-          </div>
-          <p
-            className="text-[9px] text-center mt-0.5 tabular-nums"
-            style={{ color: 'var(--muted)' }}
-          >
-            {Math.round(progress)}%
-          </p>
-        </div>
-      )}
     </div>
   )
 }

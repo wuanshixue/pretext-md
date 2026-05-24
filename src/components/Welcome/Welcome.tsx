@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { BookOpen, FileText, ArrowRight } from 'lucide-react'
+import { BookOpen, FileText, ArrowRight, X } from 'lucide-react'
 import { useFileImport } from '../../hooks/useFileImport'
 import { useHistoryStore } from '../../stores/history'
 import { useReaderStore } from '../../stores/reader'
@@ -7,6 +7,7 @@ import { useReaderStore } from '../../stores/reader'
 export function Welcome() {
   const { importViaDialog, importFromPath, importFromDrop } = useFileImport()
   const recentFiles = useHistoryStore((s) => s.recentFiles)
+  const removeRecent = useHistoryStore((s) => s.removeRecent)
   const isLoading = useReaderStore((s) => s.isLoading)
 
   return (
@@ -25,7 +26,6 @@ export function Welcome() {
         transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
         className="text-center max-w-lg"
       >
-        {/* 岛屿图标 */}
         <motion.div
           className="mx-auto mb-8 w-32 h-32 rounded-[40px] flex items-center justify-center"
           style={{
@@ -51,7 +51,6 @@ export function Welcome() {
           一座安静阅读的小岛
         </p>
 
-        {/* 打开文件按钮 */}
         <motion.button
           whileHover={{ y: -2 }}
           whileTap={{ y: 2 }}
@@ -70,13 +69,11 @@ export function Welcome() {
           {isLoading ? '加载中...' : '打开 Markdown 文件'}
         </motion.button>
 
-        {/* 拖拽提示 */}
         <p className="mt-4 text-sm" style={{ color: 'var(--muted)' }}>
           或将 .md 文件拖拽到此处
         </p>
       </motion.div>
 
-      {/* 最近文件 */}
       {recentFiles.length > 0 && (
         <motion.div
           initial={{ opacity: 0 }}
@@ -97,24 +94,37 @@ export function Welcome() {
           </h2>
           <div className="space-y-2">
             {recentFiles.slice(0, 5).map((file) => (
-              <motion.button
+              <div
                 key={file.path}
-                whileHover={{ x: 4 }}
-                onClick={() => importFromPath(file.path)}
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-left transition-colors"
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl transition-colors group"
                 style={{
                   fontFamily: 'var(--font-ui)',
                   background: 'var(--card)',
                   boxShadow: '0 2px 8px var(--shadow)',
-                  cursor: 'pointer',
                 }}
               >
-                <FileText className="w-5 h-5 flex-shrink-0" style={{ color: 'var(--green)' }} />
-                <span className="flex-1 truncate text-sm font-medium" style={{ color: 'var(--text)' }}>
-                  {file.name}
-                </span>
-                <ArrowRight className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--muted)' }} />
-              </motion.button>
+                <button
+                  onClick={() => importFromPath(file.path)}
+                  className="flex items-center gap-3 flex-1 min-w-0 text-left"
+                >
+                  <FileText className="w-5 h-5 flex-shrink-0" style={{ color: 'var(--green)' }} />
+                  <span className="flex-1 truncate text-sm font-medium" style={{ color: 'var(--text)' }}>
+                    {file.name}
+                  </span>
+                  <ArrowRight className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--muted)' }} />
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    removeRecent(file.path)
+                  }}
+                  className="w-6 h-6 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-100"
+                  style={{ color: '#e05a5a' }}
+                  title="删除记录"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
             ))}
           </div>
         </motion.div>
