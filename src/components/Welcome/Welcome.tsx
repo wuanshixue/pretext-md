@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { BookOpen, FileText, ArrowRight, X } from 'lucide-react'
+import { BookOpen, FileText, ArrowRight, X, FilePlus } from 'lucide-react'
 import { useFileImport } from '../../hooks/useFileImport'
 import { useHistoryStore } from '../../stores/history'
 import { useReaderStore } from '../../stores/reader'
@@ -9,6 +9,7 @@ export function Welcome() {
   const recentFiles = useHistoryStore((s) => s.recentFiles)
   const removeRecent = useHistoryStore((s) => s.removeRecent)
   const isLoading = useReaderStore((s) => s.isLoading)
+  const createNewFile = useReaderStore((s) => s.createNewFile)
 
   return (
     <div
@@ -72,6 +73,21 @@ export function Welcome() {
         <p className="mt-4 text-sm" style={{ color: 'var(--muted)' }}>
           或将 .md 文件拖拽到此处
         </p>
+
+        <motion.button
+          whileHover={{ y: -2 }}
+          whileTap={{ y: 2 }}
+          onClick={createNewFile}
+          className="mt-4 px-8 py-3 rounded-full text-base font-bold transition-all flex items-center gap-2 mx-auto"
+          style={{
+            fontFamily: 'var(--font-ui)',
+            background: 'rgba(127,163,107,0.15)',
+            color: 'var(--green)',
+          }}
+        >
+          <FilePlus className="w-5 h-5" />
+          新建 Markdown 文件
+        </motion.button>
       </motion.div>
 
       {recentFiles.length > 0 && (

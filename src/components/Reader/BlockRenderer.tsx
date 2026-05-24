@@ -2,6 +2,7 @@ import { useRef, useEffect } from 'react'
 import type { Block } from '../../core/markdown'
 import { useSettingsStore } from '../../stores/settings'
 import { CodeBlock } from 'animal-island-ui'
+import { InlineRenderer } from './InlineRenderer'
 
 interface BlockRendererProps {
   block: Block
@@ -39,6 +40,13 @@ export function BlockRenderer({ block, onHeightMeasured }: BlockRendererProps) {
     letterSpacing: '0.01em',
   }
 
+  const renderInline = (inlineChildren: Block['inlineChildren'], fallback: string) => {
+    if (inlineChildren && inlineChildren.length > 0) {
+      return <InlineRenderer nodes={inlineChildren} />
+    }
+    return fallback
+  }
+
   switch (block.type) {
     case 'heading': {
       const level = block.level || 1
@@ -59,7 +67,7 @@ export function BlockRenderer({ block, onHeightMeasured }: BlockRendererProps) {
         color: 'var(--island-header)',
         margin: `${fontSize * 0.8}px 0 ${fontSize * 0.4}px`,
       }
-      const content = block.content
+      const content = renderInline(block.inlineChildren, block.content)
       return (
         <div ref={ref}>
           {level === 1 && <h1 style={headingStyle}>{content}</h1>}
@@ -76,7 +84,7 @@ export function BlockRenderer({ block, onHeightMeasured }: BlockRendererProps) {
       return (
         <div ref={ref}>
           <p style={{ ...baseStyle, marginBottom: `${fontSize * 0.6}px` }}>
-            {block.content}
+            {renderInline(block.inlineChildren, block.content)}
           </p>
         </div>
       )
@@ -107,7 +115,7 @@ export function BlockRenderer({ block, onHeightMeasured }: BlockRendererProps) {
               ? block.children.map((child) => (
                   <BlockRenderer key={child.id} block={child} />
                 ))
-              : block.content}
+              : renderInline(block.inlineChildren, block.content)}
           </blockquote>
         </div>
       )
@@ -148,7 +156,7 @@ export function BlockRenderer({ block, onHeightMeasured }: BlockRendererProps) {
                     }}
                   />
                 )}
-                <span>{item.content}</span>
+                <span>{renderInline(item.inlineChildren, item.content)}</span>
                 {item.children && item.children.length > 0 && (
                   <div style={{ marginTop: `${fontSize * 0.2}px` }}>
                     {item.children.map((child) => (
@@ -180,10 +188,10 @@ export function BlockRenderer({ block, onHeightMeasured }: BlockRendererProps) {
               fontSize: `${fontSize * 0.9}px`,
             }}
           >
-            {block.headerRow && (
+            {block.headerRowInline && (
               <thead>
                 <tr>
-                  {block.headerRow.map((cell, i) => (
+                  {block.headerRowInline.map((cellInline, i) => (
                     <th
                       key={i}
                       style={{
@@ -195,17 +203,17 @@ export function BlockRenderer({ block, onHeightMeasured }: BlockRendererProps) {
                         fontFamily: 'var(--font-ui)',
                       }}
                     >
-                      {cell}
+                      <InlineRenderer nodes={cellInline} />
                     </th>
                   ))}
                 </tr>
               </thead>
             )}
-            {block.rows && (
+            {block.rowsInline && (
               <tbody>
-                {block.rows.map((row, ri) => (
+                {block.rowsInline.map((row, ri) => (
                   <tr key={ri}>
-                    {row.map((cell, ci) => (
+                    {row.map((cellInline, ci) => (
                       <td
                         key={ci}
                         style={{
@@ -213,7 +221,7 @@ export function BlockRenderer({ block, onHeightMeasured }: BlockRendererProps) {
                           borderBottom: '1px solid var(--island-border)',
                         }}
                       >
-                        {cell}
+                        <InlineRenderer nodes={cellInline} />
                       </td>
                     ))}
                   </tr>
