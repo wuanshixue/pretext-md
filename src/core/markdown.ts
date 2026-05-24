@@ -18,6 +18,8 @@ export interface Block {
   content: string
   level?: number
   lang?: string
+  ordered?: boolean
+  start?: number
   items?: ListItem[]
   rows?: string[][]
   headerRow?: string[]
@@ -91,6 +93,8 @@ function parseListToken(t: Tokens.List): Block {
     raw: t.raw,
     content,
     items,
+    ordered: t.ordered,
+    start: typeof t.start === 'number' ? t.start : undefined,
   }
 }
 

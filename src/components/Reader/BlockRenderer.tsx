@@ -112,15 +112,18 @@ export function BlockRenderer({ block, onHeightMeasured }: BlockRendererProps) {
         </div>
       )
 
-    case 'list':
+    case 'list': {
+      const isOrdered = block.ordered
+      const ListTag = isOrdered ? 'ol' : 'ul'
       return (
         <div ref={ref}>
-          <ul
+          <ListTag
+            start={isOrdered && block.start && block.start > 1 ? block.start : undefined}
             style={{
               ...baseStyle,
               paddingLeft: `${fontSize * 1.2}px`,
               marginBottom: `${fontSize * 0.6}px`,
-              listStyleType: 'disc',
+              listStyleType: isOrdered ? 'decimal' : 'disc',
             }}
           >
             {block.items?.map((item, i) => (
@@ -145,12 +148,20 @@ export function BlockRenderer({ block, onHeightMeasured }: BlockRendererProps) {
                     }}
                   />
                 )}
-                {item.content}
+                <span>{item.content}</span>
+                {item.children && item.children.length > 0 && (
+                  <div style={{ marginTop: `${fontSize * 0.2}px` }}>
+                    {item.children.map((child) => (
+                      <BlockRenderer key={child.id} block={child} />
+                    ))}
+                  </div>
+                )}
               </li>
             ))}
-          </ul>
+          </ListTag>
         </div>
       )
+    }
 
     case 'table':
       return (
